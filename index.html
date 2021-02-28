@@ -1,0 +1,344 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<title>SRGS Lab</title>
+<style type="text/css">
+/*margin and padding on body element
+  can introduce errors in determining
+  element position and are not recommended;
+  we turn them off as a foundation for YUI
+  CSS treatments. */
+body {
+	margin:0;
+	padding:0;
+}
+#top1 {
+    padding: 20px;
+    font-size:250%;
+    text-align: center;
+    background-color: #00A;
+    color: #FFF;
+}
+#center1 {
+    background-color: #FFF; 
+    height:100%;
+}
+#grammar {
+	font-family: monospace;
+	font-size: 12px;
+	padding: 4px;
+}
+#input-container {
+    margin: 3px 12px 3px 3px;
+    background-color: gray;
+}
+#input {
+    width: 100%;
+	font-family: monospace;
+	font-size: 12px;
+	padding: 2px;
+}
+#button-container {
+    text-align: center;
+	padding: 10px;
+
+}
+.header {
+    background:transparent url(build/assets/skins/sam/sprite.png) repeat-x scroll 0 -1400px;
+    border:1px solid #808080;
+}
+.header h2 {
+    color:#FFFFFF;
+    font-weight:bold;
+    margin:0;
+    padding:3px;
+}
+#msg {
+    position: absolute;
+    top: 80px;
+	margin-left: 80px;
+    display: none;
+    font-size: 20px;
+    color: gray;
+}
+#bottom1 {
+    padding: 6px;
+    font-size: 10px;
+    text-align: center;
+    background-color: #00A;
+    color: #FFF;
+}
+#treecontainer {
+    margin: 20px 0 0 20px;
+}
+</style>
+
+	
+<link rel="stylesheet" type="text/css" href="build/reset-fonts-grids/reset-fonts-grids.css" />
+<link rel="stylesheet" type="text/css" href="build/resize/assets/skins/sam/resize.css" />
+<link rel="stylesheet" type="text/css" href="build/layout/assets/skins/sam/layout.css" />
+<link rel="stylesheet" type="text/css" href="build/button/assets/skins/sam/button.css" />
+<link rel="stylesheet" type="text/css" href="build/container/assets/skins/sam/container.css" />
+
+<link rel="stylesheet" type="text/css" href="jsonbrowser.css" />
+
+
+<script type="text/javascript" src="build/yahoo/yahoo-min.js"></script>
+<script type="text/javascript" src="build/event/event-min.js"></script>
+<script type="text/javascript" src="build/dom/dom-min.js"></script>
+<script type="text/javascript" src="build/element/element-min.js"></script>
+<script type="text/javascript" src="build/dragdrop/dragdrop-min.js"></script>
+<script type="text/javascript" src="build/resize/resize-min.js"></script>
+<script type="text/javascript" src="build/animation/animation-min.js"></script>
+<script type="text/javascript" src="build/layout/layout-min.js"></script>
+<script type="text/javascript" src="build/button/button-min.js"></script>
+<script type="text/javascript" src="build/container/container-min.js"></script>
+
+<script type="text/javascript" src="js-chartparser/srgs.js"></script>
+<script type="text/javascript" src="js-chartparser/chartparser.js"></script>
+<script type="text/javascript" src="js-chartparser/runparser.js"></script>
+<script type="text/javascript" src="jsonbrowser.js"></script>
+
+</head>
+
+<body class=" yui-skin-sam">
+<div id="top1">
+    <h1>SRGS   Laboratory</h1>
+</div>
+<div id="left1">
+    <textarea id="grammar" spellcheck="false">
+&lt;grammar root=&quot;order&quot;&gt;
+   &lt;rule id=&quot;order&quot;&gt;
+      I would like a
+      &lt;ruleref uri=&quot;#drink&quot;/&gt;
+      &lt;tag&gt;out.drink = new Object(); out.drink.liquid=rules.drink.type;
+           out.drink.drinksize=rules.drink.drinksize;&lt;/tag&gt;
+      and
+      &lt;ruleref uri=&quot;#pizza&quot;/&gt;
+      &lt;tag&gt;out.pizza=rules.pizza;&lt;/tag&gt;
+   &lt;/rule&gt;
+   &lt;rule id=&quot;kindofdrink&quot;&gt;
+      &lt;one-of&gt;
+         &lt;item&gt;coke&lt;/item&gt;
+         &lt;item&gt;pepsi&lt;/item&gt;
+         &lt;item&gt;coca cola&lt;tag&gt;out=&quot;coke&quot;;&lt;/tag&gt;&lt;/item&gt;
+      &lt;/one-of&gt;
+   &lt;/rule&gt;
+   &lt;rule id=&quot;foodsize&quot;&gt;
+      &lt;tag&gt;out=&quot;medium&quot;;&lt;/tag&gt; &lt;!-- &quot;medium&quot; is default if nothing said --&gt;
+      &lt;item repeat=&quot;0-1&quot;&gt;
+         &lt;one-of&gt;
+            &lt;item&gt;small&lt;tag&gt;out=&quot;small&quot;;&lt;/tag&gt;&lt;/item&gt;
+            &lt;item&gt;medium&lt;/item&gt;
+            &lt;item&gt;large&lt;tag&gt;out=&quot;large&quot;;&lt;/tag&gt;&lt;/item&gt;
+            &lt;item&gt;regular&lt;tag&gt;out=&quot;medium&quot;;&lt;/tag&gt;&lt;/item&gt;
+         &lt;/one-of&gt;
+      &lt;/item&gt;
+   &lt;/rule&gt;
+   &lt;!-- Construct Array of toppings, return Array --&gt;
+   &lt;rule id=&quot;tops&quot;&gt;
+      &lt;tag&gt;out=new Array;&lt;/tag&gt;
+      &lt;ruleref uri=&quot;#top&quot;/&gt;
+      &lt;tag&gt;out.push(rules.top);&lt;/tag&gt;
+      &lt;item repeat=&quot;1-&quot;&gt;
+         and
+         &lt;ruleref uri=&quot;#top&quot;/&gt;
+         &lt;tag&gt;out.push(rules.top);&lt;/tag&gt;
+      &lt;/item&gt;
+   &lt;/rule&gt;
+   &lt;rule id=&quot;top&quot;&gt;
+      &lt;one-of&gt;
+         &lt;item&gt;anchovies&lt;/item&gt;
+         &lt;item&gt;pepperoni&lt;/item&gt;
+         &lt;item&gt;mushroom&lt;tag&gt;out=&quot;mushrooms&quot;;&lt;/tag&gt;&lt;/item&gt;
+         &lt;item&gt;mushrooms&lt;/item&gt;
+      &lt;/one-of&gt;
+   &lt;/rule&gt;
+   &lt;!-- Two properties (drinksize, type) on left hand side Rule Variable --&gt;
+   &lt;rule id=&quot;drink&quot;&gt;
+      &lt;ruleref uri=&quot;#foodsize&quot;/&gt;
+      &lt;ruleref uri=&quot;#kindofdrink&quot;/&gt;
+      &lt;tag&gt;out.drinksize=rules.foodsize; out.type=rules.kindofdrink;&lt;/tag&gt;
+   &lt;/rule&gt;
+   &lt;!-- Three properties on rules.pizza --&gt;
+   &lt;rule id=&quot;pizza&quot;&gt;
+      &lt;ruleref uri=&quot;#number&quot;/&gt;
+      &lt;ruleref uri=&quot;#foodsize&quot;/&gt;
+      &lt;tag&gt;out.pizzasize=rules.foodsize; out.number=rules.number;&lt;/tag&gt;
+      pizzas with
+      &lt;ruleref uri=&quot;#tops&quot;/&gt;
+      &lt;tag&gt;out.topping=rules.tops;&lt;/tag&gt;
+   &lt;/rule&gt;
+   &lt;rule id=&quot;number&quot;&gt;
+      &lt;one-of&gt;
+         &lt;item&gt;
+            &lt;tag&gt;out=1;&lt;/tag&gt;
+            &lt;one-of&gt;
+               &lt;item&gt;a&lt;/item&gt;
+               &lt;item&gt;one&lt;/item&gt;
+            &lt;/one-of&gt;
+         &lt;/item&gt;
+         &lt;item&gt;two&lt;tag&gt;out=2;&lt;/tag&gt;&lt;/item&gt;
+         &lt;item&gt;three&lt;tag&gt;out=3;&lt;/tag&gt;&lt;/item&gt;
+      &lt;/one-of&gt;
+   &lt;/rule&gt;
+&lt;/grammar&gt;
+    </textarea>
+    <div class="header">
+        <h2>String</h2>
+    </div>
+    <div id="input-container">
+        <input type="text" id="input" spellcheck="false" value="I would like a coca cola and three large pizzas with pepperoni and mushrooms">
+    </div>
+    <div class="header">
+        <h2>Find analysis</h2>
+    </div>
+    <div id="button-container">
+        <button id="first">Parse</button>
+    </div>
+</div>
+<div id="center1">
+    <div class="right" id="treecontainer">
+        <div id="results"></div>
+        <div id="msg"></div>
+    </div>
+</div>
+<div id="bottom1">
+    <p>Authors: Torbj&ouml;rn Lager and Peter Ljungl&ouml;f. Tree drawing routine by <a href="http://weston.ruter.net">Weston Ruter</a>.</p>
+</div>
+
+<script>
+
+String.prototype.trim = function () {
+    return this.replace(/^\s*/, "").replace(/\s*$/, "");
+}
+
+function loadGrammar(str) {
+    var dom = parseXML(str);
+    var root = dom.getElementsByTagName("grammar")[0].getAttribute("root");
+    var grammar = new Grammar(root);
+    var xrules = dom.getElementsByTagName("rule");
+    for(var r=0; r < xrules.length; r++) {
+        var xrule = xrules[r];
+        var id = xrule.getAttribute("id");
+        grammar[id] = processRuleExpansions(xrule);
+    }
+    return grammar;
+}
+
+function processRuleExpansions(xrule) {
+    var xitems = xrule.childNodes;
+    var rule = [];
+    for(var i=0; i < xitems.length; i++) {
+        if (xitems[i].nodeType == 3) {
+            var str = xitems[i].textContent.trim();
+            if (str != "") {
+                rule.push(str.split(/ +/));
+            }
+        } else if (xitems[i].nodeType == 1) {
+            if (xitems[i].nodeName == "token") {
+                rule.push(Tag(xitems[i].textContent));
+            } else if (xitems[i].nodeName == "ruleref") {
+                var uri = xitems[i].getAttribute("uri");
+                rule.push(Ref(uri.slice(1)));
+            } else if (xitems[i].nodeName == "tag") {
+                rule.push(Tag(xitems[i].textContent.trim()));
+            } else if (xitems[i].nodeName == "one-of") {
+                rule.push(OneOf(processRuleExpansions(xitems[i])));
+            } else if (xitems[i].nodeName == "item") {
+                var repeat = xitems[i].getAttribute("repeat");
+                if (!repeat) {
+                    rule.push(processRuleExpansions(xitems[i]));
+                } else {
+                    var r = repeat.split("-");
+                    var min = parseInt(r[0]);
+                    var max = parseInt(r[1]);
+                    max = (max) ? max : Infinity;
+                    rule.push(Repeat(min, max, processRuleExpansions(xitems[i])));
+                }
+            } else {
+                console.log(xitems[i]);
+            }
+        }
+    }
+	return rule;
+}
+
+/**
+ * Parse the XML document contained in the string argument and return
+ * a Document object that represents it.
+ */
+function parseXML(text) {
+    if (typeof DOMParser != "undefined") {
+        // Mozilla, Firefox, and related browsers
+        return (new DOMParser()).parseFromString(text, "application/xml");
+    }
+    else if (typeof ActiveXObject != "undefined") {
+        // Internet Explorer.
+        var doc = XML.newDocument();  // Create an empty document
+        doc.loadXML(text);            // Parse text into it
+        return doc;                   // Return it
+    }
+    else {
+        // As a last resort, try loading the document from a data: URL
+        // This is supposed to work in Safari. Thanks to Manos Batsis and
+        // his Sarissa library (sarissa.sourceforge.net) for this technique.
+        var url = "data:text/xml;charset=utf-8," + encodeURIComponent(text);
+        var request = new XMLHttpRequest();
+        request.open("GET", url, false);
+        request.send(null);
+        return request.responseXML;
+    }
+};
+
+    var grammar;
+    var input;
+    
+(function() {
+    
+    var Dom = YAHOO.util.Dom,
+    Event = YAHOO.util.Event;
+        
+    Event.onDOMReady(function() {
+        var layout = new YAHOO.widget.Layout({
+            units: [
+                { position: 'top', height: 90, body: 'top1', gutter: '5px', collapse: false, resize: false },
+                { position: 'left', header: 'Grammar', gutter: '5px', width: 600, resize: true, body: 'left1', collapse: true, collapseSize: 30, animate: false },
+                { position: 'center', header: 'Tree', gutter: '5px', body: 'center1', scroll: true},
+                { position: 'bottom', height: 34, body: 'bottom1', gutter: '5px'}
+            ]
+        });
+        layout.on('resize', function() {
+            setTimeout(function() {
+                Dom.setStyle(Dom.get('grammar'), 'height', (layout.getSizes().center.h - 170) + 'px');
+                Dom.setStyle(Dom.get('grammar'), 'width', (layout.getSizes().left.w - 20) + 'px');
+            }, 0);
+            }
+        );
+        layout.on('render', function() {
+            layout.getUnitByPosition('left').on('close', function() {
+                closeLeft();
+            });
+        });
+        layout.render();
+        var handleClick = function(o) {
+            input = Dom.get("input").value;
+            if (o.target.id == "first-button") {
+                grammar = loadGrammar(Dom.get("grammar").value);
+                console.log(grammar);
+                runParser(input.split(/\s+/));
+            }
+        }
+        var firstbtn = new YAHOO.widget.Button("first"); 
+        firstbtn.on("click", handleClick); 
+        firstbtn.focus();
+					
+			
+    });
+
+
+})();
+</script>
+</body>
+</html>
